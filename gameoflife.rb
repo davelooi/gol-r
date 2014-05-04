@@ -1,19 +1,4 @@
 ###########
-# Helpers
-###########
-
-def pp grid
-  system "clear"
-  grid.each do |row|
-    row.each do |col|
-      print col
-    end
-    print "\n"
-  end
-end
-
-
-###########
 # LIFE
 ###########
 
@@ -82,7 +67,7 @@ end
 class GameOfLife
   attr_accessor :grid
 
-  def initialize(row=20, col=20)
+  def initialize(row=50, col=50)
     @grid = Array.new(row) {
       |rowIndex| Array.new(col) {
         |colIndex| Life.new(rowIndex, colIndex)
@@ -105,16 +90,28 @@ class GameOfLife
 end
 
 
+###########
+# Helpers
+###########
+
+def pp grid
+  system "clear"
+  grid.each do |row|
+    row.each do |col|
+      print col
+    end
+    print "\n"
+  end
+end
+
 #######
 # START
 #######
 game = GameOfLife.new
-puts "Start"
 pp game.grid
 5.times{
   sleep 1
   game.tick
-  puts "Tick"
   pp game.grid
 }
 

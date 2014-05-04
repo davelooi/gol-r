@@ -1,10 +1,10 @@
 2048-r
 ======
 
-Ruby implementation of 2048 game
+Ruby implementation of Conway's Game of Life
 
 To play:
 
 ```
-ruby main.rb
+ruby gameoflife.rb
 ```
