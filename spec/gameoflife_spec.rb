@@ -10,7 +10,7 @@ describe Life do
   end
 
   context "alive" do
-    subject(:alive) { Life.new(0,0,true) }
+    subject(:alive) { Life.new(true) }
     it "should be alive" do
       expect(alive.isAlive?).to be_true
     end
@@ -20,7 +20,7 @@ describe Life do
   end
 
   context "dead" do
-    subject(:dead) { Life.new(0,0,false) }
+    subject(:dead) { Life.new(false) }
     it "should be dead" do
       expect(dead.isAlive?).to be_false
     end
@@ -29,123 +29,83 @@ describe Life do
     end
   end
 
-  context "aliveNeighboursCount with all live neighbours" do
-    let(:grid) { 
-      Array.new(3) { 
-        |rowIndex| Array.new(3) { 
-          |colIndex| Life.new(rowIndex, colIndex, true) 
-        } 
-      } 
-    }
-    it "should count 8 live neighbours" do
-      grid[1][1].aliveNeighboursCount(grid).should == 8
-    end
-  end
-
-  context "aliveNeighboursCount with all dead neighbours" do
-    let(:grid) { 
-      Array.new(3) { 
-        |rowIndex| Array.new(3) { 
-          |colIndex| Life.new(rowIndex, colIndex, false) 
-        } 
-      } 
-    }
-    it "should count 0 live neighbours" do
-      grid[1][1].aliveNeighboursCount(grid).should == 0
-    end
-  end
-
-  context "rule 1" do
-    let(:grid) { 
-      Array.new(3) { 
-        |rowIndex| Array.new(3) { 
-          |colIndex| Life.new(rowIndex, colIndex, false) 
-        } 
-      } 
-    }
-    it "should die with fewer than 0 live neighbour" do
-      grid[1][1] = Life.new(1,1,true) # alive
-      expect(grid[1][1].isAlive?).to be_true
-      expect(grid[1][1].nextState(grid)).to be_false
+  context "RULE 1; alive" do
+    let(:life) { Life.new(true) }
+    it "should die with 0 and 1 live neighbour" do
+      expect(life.nextState(0)).to be_false
     end
     it "should die with fewer than 1 live neighbour" do
-      grid[1][1] = Life.new(1,1,true) # alive
-      grid[0][0] = Life.new(0,0,true)
-      expect(grid[1][1].isAlive?).to be_true
-      expect(grid[1][1].nextState(grid)).to be_false
+      expect(life.nextState(1)).to be_false
     end
   end
 
-  context "rule 2" do
-    let(:grid) { 
-      Array.new(3) { 
-        |rowIndex| Array.new(3) { 
-          |colIndex| Life.new(rowIndex, colIndex, false) 
-        } 
-      } 
-    }
+  context "RULE 2; alive" do
+    let(:life) { Life.new(true) }
     it "should stay alive with 2 live neighbour" do
-      grid[1][1] = Life.new(1,1,true) # alive
-      grid[0][0] = Life.new(0,0,true)
-      grid[2][2] = Life.new(2,2,true)
-      expect(grid[1][1].isAlive?).to be_true
-      expect(grid[1][1].nextState(grid)).to be_true
+      expect(life.nextState(2)).to be_true
     end
     it "should stay alive with 3 live neighbour" do
-      grid[1][1] = Life.new(1,1,true) # alive
-      grid[0][0] = Life.new(0,0,true)
-      grid[2][2] = Life.new(2,2,true)
-      grid[0][2] = Life.new(0,2,true)
-      expect(grid[1][1].isAlive?).to be_true
-      expect(grid[1][1].nextState(grid)).to be_true
+      expect(life.nextState(3)).to be_true
     end
   end
-  context "rule 3" do
-    let(:grid) { 
-      Array.new(3) { 
-        |rowIndex| Array.new(3) { 
-          |colIndex| Life.new(rowIndex, colIndex, false) 
-        } 
-      } 
-    }
+  context "RULE 3; alive" do
+    let(:life) { Life.new(true) }
     it "should die with 4 or more live neighbour" do
-      grid[1][1] = Life.new(1,1,true) # alive
-      grid[0][0] = Life.new(0,0,true)
-      grid[0][1] = Life.new(0,1,true)
-      grid[0][2] = Life.new(0,2,true)
-      grid[1][0] = Life.new(1,0,true)
-      expect(grid[1][1].isAlive?).to be_true
-      expect(grid[1][1].nextState(grid)).to be_false
+      expect(life.nextState(4)).to be_false
     end
-    let(:grid) { 
-      Array.new(3) { 
-        |rowIndex| Array.new(3) { 
-          |colIndex| Life.new(rowIndex, colIndex, true)
-        } 
-      } 
-    }
     it "should die with 8 alive neighbours" do
-      grid[1][1] = Life.new(1,1,true) # alive
-      grid[1][1].aliveNeighboursCount(grid).should == 8
-      expect(grid[1][1].isAlive?).to be_true
-      expect(grid[1][1].nextState(grid)).to be_false
+      expect(life.nextState(8)).to be_false
     end
   end
-  context "rule 4" do
-    let(:grid) { 
-      Array.new(3) { 
-        |rowIndex| Array.new(3) { 
-          |colIndex| Life.new(rowIndex, colIndex, false) 
-        } 
-      } 
-    }
+  context "RULE 4; dead" do
+    let(:life) { Life.new(false) }
     it "should comes back to live with 3 neighbours" do
-      grid[1][1] = Life.new(1,1,false) # dead
-      grid[0][0] = Life.new(0,0,true)
-      grid[2][2] = Life.new(2,2,true)
-      grid[0][2] = Life.new(0,2,true)
-      expect(grid[1][1].isAlive?).to be_false
-      expect(grid[1][1].nextState(grid)).to be_true
+      expect(life.nextState(3)).to be_true
+    end
+    it "should stay dead with 0 neighbours" do
+      expect(life.nextState(0)).to be_false
+    end
+    it "should stay dead with 2 neighbours" do
+      expect(life.nextState(2)).to be_false
+    end
+    it "should stay dead with 4 neighbours" do
+      expect(life.nextState(4)).to be_false
+    end
+    it "should stay dead with 8 neighbours" do
+      expect(life.nextState(8)).to be_false
+    end
+  end
+end
+
+## Grid
+describe GridOfLife do
+  context "new" do
+    it "should create a new Grid" do
+      grid = GridOfLife.new(3,3)
+      expect(grid.is_a?(GridOfLife)).to be_true
+    end
+  end
+
+  context "countLiveNeighbours" do
+    before(:all) do
+      @grid = GridOfLife.new(3,3,false)
+      (0..2).each do |row|
+        (0..2).each do |col|
+          @grid.grid[row][col] = Life.new(true)
+        end
+      end
+    end
+    it "should not exceed corner boundary" do
+      @grid.countLiveNeighbours(0,0).should == 3
+      @grid.countLiveNeighbours(0,2).should == 3
+      @grid.countLiveNeighbours(2,0).should == 3
+      @grid.countLiveNeighbours(2,2).should == 3
+    end
+    it "should not exceed mid boundary" do
+      @grid.countLiveNeighbours(0,1).should == 5
+      @grid.countLiveNeighbours(1,0).should == 5
+      @grid.countLiveNeighbours(1,2).should == 5
+      @grid.countLiveNeighbours(2,1).should == 5
     end
   end
 end

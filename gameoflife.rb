@@ -3,9 +3,7 @@
 ###########
 
 class Life
-  def initialize (row=0,col=0,alive=randomAlive)
-    @row = row
-    @col = col
+  def initialize (alive=randomAlive)
     @alive = alive
   end
 
@@ -21,12 +19,11 @@ class Life
     @alive ? '1' : ' '
   end
 
-  def nextState grid
-    aN = self.aliveNeighboursCount grid
-    if aN == 3
+  def nextState (aliveNeighbours)
+    if aliveNeighbours == 3
       # Rule 2
       return true
-    elsif aN == 2 and self.isAlive?
+    elsif aliveNeighbours == 2 and self.isAlive?
       # Rule 4
       return true        
     else
@@ -34,8 +31,36 @@ class Life
       return false
     end
   end
+end
 
-  def aliveNeighboursCount grid
+#############
+# GRID
+#############
+class GridOfLife
+  attr_accessor :grid
+
+  def initialize(row,col,createLife=true)
+    @row = row
+    @col = col
+    @grid = Array.new(@row) {
+      |rowIndex| Array.new(@col) {
+        |colIndex| Life.new if createLife
+      } 
+    }
+    @next = Array.new(@row) { Array.new(@col) }
+  end
+
+  def tick
+    (0..@row-1).each do |y|
+      (0..@col-1).each do |x|
+        # apply rules on each life
+        @next[y][x] = Life.new(@grid[y][x].nextState(countLiveNeighbours(y,x)))
+      end
+    end
+    @grid = @next
+  end
+
+  def countLiveNeighbours (row,col)
     #     col
     # row (-1,1)  (0,1)     (1,1)
     #     (-1,0)  (row,col) (1,0)
@@ -47,16 +72,26 @@ class Life
         next if x==0 and y==0
         
         ### Out of Bound ###
-        next if @row+y < 0
-        next if @col+x < 0
-        next if @row+y > grid.count-1
-        next if @col+x > grid[@row].count-1
+        next if row+y < 0
+        next if col+x < 0
+        next if row+y > @grid.count-1
+        next if col+x > @grid[row].count-1
 
         # Count
-        aNC+=1 if grid[@row+y][@col+x].isAlive?
+        aNC+=1 if @grid[row+y][col+x].isAlive?
       end
     end
     return aNC
+  end
+
+  def pp
+    system "clear"
+    @grid.each do |row|
+      row.each do |col|
+        print col
+      end
+      print "\n"
+    end
   end
 end
 
@@ -65,54 +100,30 @@ end
 ############
 
 class GameOfLife
-  attr_accessor :grid
-
   def initialize(row=50, col=50)
-    @grid = Array.new(row) {
-      |rowIndex| Array.new(col) {
-        |colIndex| Life.new(rowIndex, colIndex)
-      } 
-    }
-    @next = Array.new(row) { Array.new(col) }
-    @row = row
-    @col = col
+    @grid = GridOfLife.new(row,col,true)
   end
 
   def tick
-    (0..@row-1).each do |y|
-      (0..@col-1).each do |x|
-        # apply rules on each life
-        @next[y][x] = Life.new(y,x,@grid[y][x].nextState(grid))
-      end
-    end
-    @grid = @next
+    @grid.tick
   end
+
+  def pp
+    @grid.pp
+  end
+
 end
 
-
-###########
-# Helpers
-###########
-
-def pp grid
-  system "clear"
-  grid.each do |row|
-    row.each do |col|
-      print col
-    end
-    print "\n"
-  end
-end
 
 #######
 # START
 #######
 game = GameOfLife.new
-pp game.grid
+game.pp
 5.times{
-  sleep 1
+  #sleep 1
   game.tick
-  pp game.grid
+  game.pp
 }
 
 
