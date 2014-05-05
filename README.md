@@ -6,5 +6,5 @@ Ruby implementation of Conway's Game of Life
 To play:
 
 ```
-ruby gameoflife.rb
+ruby main.rb
 ```
