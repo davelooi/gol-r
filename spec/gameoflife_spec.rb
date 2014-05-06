@@ -11,9 +11,7 @@ describe GameOfLife do
     end
   end
 
-  ##############
-  # LIFE
-  ##############
+  ### Life
   context "when alive" do
     subject(:game) { GameOfLife.new(1,1,false,1) }
     it "should be alive" do
@@ -75,6 +73,7 @@ describe GameOfLife do
     end
   end
 
+  ### COUNT NEIGHBOURS
   context "countLiveNeighbours" do
     let(:game) { GameOfLife.new(3,3,false,1) }
     it "should not exceed corner boundary" do
@@ -94,6 +93,7 @@ describe GameOfLife do
     end
   end
 
+  ### TICK
   # examples from Conway's Game of Life wiki
   context "Still Life" do
     context "Block" do
